@@ -82,7 +82,10 @@ PNG/JPG or PDF and getting the recognized text back (rendered right-to-left):
 
 ```bash
 pip install -r fastOCR/requirements.txt
-uvicorn fastOCR.main:app --port 8000     # run from the repo root
+
+uvicorn fastOCR.main:app --port 8000     # from the repo root
+# — or —
+cd fastOCR && uvicorn main:app --port 8000   # from inside fastOCR/
 ```
 
 Open **http://localhost:8000** in a browser, or call the API directly:

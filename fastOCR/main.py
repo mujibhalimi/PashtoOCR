@@ -1,8 +1,12 @@
 """FastAPI server for the Pashto OCR model (mhalimi3008/pashtoOCR).
 
-Run from the repo root (or this directory):
+Run from the repo root:
 
-  uvicorn fastOCR.main:app --host 0.0.0.0 --port 8000
+  uvicorn fastOCR.main:app --port 8000
+
+or from inside the fastOCR/ directory:
+
+  uvicorn main:app --port 8000
 
 Then open http://localhost:8000 — upload a PNG/JPG or a multi-page PDF and get
 the recognized Pashto text back, or call the API directly:
