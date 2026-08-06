@@ -6,3 +6,7 @@
 !README.md
 !test_model.py
 !test.png
+!fastOCR/
+!fastOCR/main.py
+!fastOCR/index.html
+!fastOCR/requirements.txt

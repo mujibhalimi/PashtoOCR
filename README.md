@@ -75,6 +75,23 @@ terminals can't render Arabic script; use `--raw` (or `-o file.txt`) for the
 logical-order text you'd paste into a document. The script auto-selects the device:
 Apple Silicon **MPS** → CUDA → CPU.
 
+## Web API + browser UI (FastAPI)
+
+`fastOCR/` contains a small FastAPI server with a web page for uploading a
+PNG/JPG or PDF and getting the recognized text back (rendered right-to-left):
+
+```bash
+pip install -r fastOCR/requirements.txt
+uvicorn fastOCR.main:app --port 8000     # run from the repo root
+```
+
+Open **http://localhost:8000** in a browser, or call the API directly:
+
+```bash
+curl -F "file=@test.png" http://localhost:8000/ocr
+# → {"filename": "test.png", "text": "..."}
+```
+
 ## Using the trained model in your own code
 
 ```python
@@ -99,6 +116,9 @@ For full pages and PDFs use `segment_lines` / `ocr_image` / `ocr_file` from
 | File | Purpose |
 |------|---------|
 | `test_model.py` | Local inference script (images, PDFs) |
+| `fastOCR/main.py` | FastAPI server (`/ocr` endpoint + serves the web UI) |
+| `fastOCR/index.html` | Browser upload page with RTL result display |
+| `fastOCR/requirements.txt` | Dependencies for the API server |
 | `test.png` | Sample Pashto image for testing |
 | `README.md` | This file |
 

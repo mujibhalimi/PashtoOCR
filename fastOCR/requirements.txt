@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+python-multipart
+torch
+opencv-python
+pillow
+numpy
+huggingface_hub
+arabic-reshaper
+python-bidi
+pypdfium2
