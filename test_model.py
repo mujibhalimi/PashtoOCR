@@ -290,8 +290,8 @@ def run_benchmark(model, id2char, limit):
 def main():
     ap = argparse.ArgumentParser(description="Test the Pashto OCR model")
     ap.add_argument("file", nargs="?", help="image or PDF to OCR")
-    ap.add_argument("--weights", default="crnn_handwriting.pt",
-                    help="crnn_handwriting.pt (default) or crnn.pt (printed-only)")
+    ap.add_argument("--weights", default="crnn_pashtoOCR.pt",
+                    help="crnn_pashtoOCR.pt (default) or crnn.pt (printed-only)")
     ap.add_argument("--benchmark", action="store_true",
                     help="evaluate CER/WER on the KPTI handwritten test set")
     ap.add_argument("--limit", type=int, default=0,
