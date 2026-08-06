@@ -97,7 +97,7 @@ curl -F "file=@test.png" http://localhost:8000/ocr
 ```python
 import json, torch
 from huggingface_hub import hf_hub_download
-from test_model import CRNN, ocr_file  # architecture + full page/PDF pipeline
+from fastOCR.ocr_engine import CRNN, ocr_file  # architecture + full page/PDF pipeline
 
 REPO = "mhalimi3008/pashtoOCR"
 weights = hf_hub_download(REPO, "crnn_pashtoOCR.pt")
@@ -109,13 +109,14 @@ model.eval()
 ```
 
 For full pages and PDFs use `segment_lines` / `ocr_image` / `ocr_file` from
-`test_model.py` (automatic line segmentation → per-line recognition).
+`fastOCR/ocr_engine.py` (automatic line segmentation → per-line recognition).
 
 ## Repo structure
 
 | File | Purpose |
 |------|---------|
-| `test_model.py` | Local inference script (images, PDFs) |
+| `test_model.py` | Command-line test script (images, PDFs, RTL terminal output) |
+| `fastOCR/ocr_engine.py` | All model code: CRNN, preprocessing, line segmentation, inference |
 | `fastOCR/main.py` | FastAPI server (`/ocr` endpoint + serves the web UI) |
 | `fastOCR/index.html` | Browser upload page with RTL result display |
 | `fastOCR/requirements.txt` | Dependencies for the API server |

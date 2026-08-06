@@ -8,5 +8,6 @@
 !test.png
 !fastOCR/
 !fastOCR/main.py
+!fastOCR/ocr_engine.py
 !fastOCR/index.html
 !fastOCR/requirements.txt

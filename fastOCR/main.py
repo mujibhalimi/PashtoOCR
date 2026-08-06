@@ -10,7 +10,6 @@ the recognized Pashto text back, or call the API directly:
   curl -F "file=@test.png" http://localhost:8000/ocr
 """
 
-import sys
 import tempfile
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -18,9 +17,10 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
 
-# test_model.py lives in the repo root, one level up
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from test_model import device, load_model, ocr_file  # noqa: E402
+try:  # uvicorn fastOCR.main:app (repo root)
+    from .ocr_engine import device, load_model, ocr_file
+except ImportError:  # uvicorn main:app (inside fastOCR/)
+    from ocr_engine import device, load_model, ocr_file
 
 WEIGHTS = "crnn_pashtoOCR.pt"
 ALLOWED_SUFFIXES = {".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".webp", ".pdf"}
