@@ -4,8 +4,7 @@ Usage:
   python test_model.py page.png                 # OCR an image (PNG/JPG/BMP/TIFF...)
   python test_model.py scan.pdf                 # OCR a multi-page PDF
   python test_model.py page.png -o out.txt      # also save raw text to a file
-  python test_model.py page.png --weights crnn.pt   # use printed-only weights
-  python test_model.py --benchmark              # CER/WER on the KPTI handwritten test set
+  python test_model.py page.png --weights crnn.pt   # use the earlier checkpoint
 
 Terminal output is reshaped for RTL display (joined glyphs, visual order) because
 most terminals can't render Arabic script; use --raw (or -o file.txt) for the
@@ -17,9 +16,6 @@ The model and charset are downloaded from the Hugging Face Hub on first run
 
 import argparse
 import json
-import subprocess
-import sys
-import unicodedata
 from pathlib import Path
 
 import cv2
@@ -30,7 +26,6 @@ from huggingface_hub import hf_hub_download
 from PIL import Image, ImageOps
 
 HF_REPO = "mhalimi3008/pashtoOCR"
-KPTI_REPO = "https://github.com/rahmad77/KPTI"
 
 IMG_H = 48
 MAX_W = 1600
@@ -243,59 +238,13 @@ def ocr_file(model, id2char, path):
     return "\n\n".join(ocr_image(model, id2char, pg) for pg in load_pages(path))
 
 
-# -------------------------------------------------------------- benchmark
-
-def clean_text(t):
-    t = unicodedata.normalize("NFC", str(t))
-    return " ".join(t.split())
-
-
-def run_benchmark(model, id2char, limit):
-    import jiwer
-    kpti_dir = Path(__file__).parent / "KPTI"
-    if not kpti_dir.exists():
-        print("Cloning KPTI (~207 MB, one-time)...")
-        subprocess.run(["git", "clone", "--depth", "1", KPTI_REPO, str(kpti_dir)], check=True)
-
-    recs = []
-    for jpg in sorted((kpti_dir / "KPTI-TestData").glob("*.jpg")):
-        gt = jpg.with_suffix(".txt")
-        if not gt.exists():
-            gt = jpg.with_suffix(".gt.txt")
-        if not gt.exists():
-            continue
-        text = clean_text(gt.read_text(encoding="utf-8"))
-        if text:
-            recs.append((jpg, text))
-    if limit:
-        recs = recs[:limit]
-    print(f"KPTI test lines: {len(recs)}  (device={device})")
-
-    refs, hyps = [], []
-    for i, (jpg, text) in enumerate(recs, 1):
-        refs.append(text)
-        hyps.append(ocr_line(model, id2char, Image.open(jpg)))
-        if i % 200 == 0 or i == len(recs):
-            print(f"  {i}/{len(recs)}  running CER={jiwer.cer(refs, hyps):.4f}")
-
-    cer, wer = jiwer.cer(refs, hyps), jiwer.wer(refs, hyps)
-    print(f"\nKPTI TEST — CER: {cer:.4f}   WER: {wer:.4f}")
-    print("\nSample predictions:")
-    for ref, hyp in list(zip(refs, hyps))[:5]:
-        print(f"GT : {term(ref)}\nOCR: {term(hyp)}\n" + "-" * 60)
-
-
 # -------------------------------------------------------------------- cli
 
 def main():
     ap = argparse.ArgumentParser(description="Test the Pashto OCR model")
-    ap.add_argument("file", nargs="?", help="image or PDF to OCR")
+    ap.add_argument("file", help="image or PDF to OCR")
     ap.add_argument("--weights", default="crnn_pashtoOCR.pt",
-                    help="crnn_pashtoOCR.pt (default) or crnn.pt (printed-only)")
-    ap.add_argument("--benchmark", action="store_true",
-                    help="evaluate CER/WER on the KPTI handwritten test set")
-    ap.add_argument("--limit", type=int, default=0,
-                    help="benchmark only the first N lines (0 = all 1,500+)")
+                    help="crnn_pashtoOCR.pt (default) or crnn.pt (earlier checkpoint)")
     ap.add_argument("-o", "--out", metavar="FILE",
                     help="write the recognized text (logical order) to this file")
     ap.add_argument("--raw", action="store_true",
@@ -304,20 +253,14 @@ def main():
     global RAW_OUTPUT
     RAW_OUTPUT = args.raw
 
-    if not args.benchmark and not args.file:
-        ap.error("give an image/PDF path, or use --benchmark")
-
     print(f"Loading {args.weights} from {HF_REPO} (device={device})...")
     model, id2char = load_model(args.weights)
 
-    if args.benchmark:
-        run_benchmark(model, id2char, args.limit)
-    if args.file:
-        text = ocr_file(model, id2char, args.file)
-        print(term(text))
-        if args.out:
-            Path(args.out).write_text(text + "\n", encoding="utf-8")
-            print(f"\n[saved raw text to {args.out}]")
+    text = ocr_file(model, id2char, args.file)
+    print(term(text))
+    if args.out:
+        Path(args.out).write_text(text + "\n", encoding="utf-8")
+        print(f"\n[saved raw text to {args.out}]")
 
 
 if __name__ == "__main__":

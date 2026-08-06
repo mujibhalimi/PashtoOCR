@@ -16,7 +16,6 @@ Inference accepts **PNG / JPG / any common image format / multi-page PDF**.
 | Model hosting / download | Hugging Face Hub (`huggingface_hub`) |
 | PDF rendering | `pypdfium2` (300 dpi) |
 | RTL terminal display | `arabic-reshaper` + `python-bidi` |
-| Evaluation metrics | `jiwer` (CER / WER) |
 | Training environment | Kaggle notebook, GPU (T4 x2 / P100) |
 
 ## Architecture
@@ -55,7 +54,7 @@ on first run (cached in `~/.cache/huggingface` afterwards). A sample image
 ```bash
 # install dependencies (Python 3.10+)
 pip install torch opencv-python pillow numpy huggingface_hub \
-            arabic-reshaper python-bidi pypdfium2 jiwer
+            arabic-reshaper python-bidi pypdfium2
 
 # OCR the included sample image
 python test_model.py test.png
