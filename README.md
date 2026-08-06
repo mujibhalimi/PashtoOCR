@@ -75,32 +75,12 @@ terminals can't render Arabic script; use `--raw` (or `-o file.txt`) for the
 logical-order text you'd paste into a document. The script auto-selects the device:
 Apple Silicon **MPS** → CUDA → CPU.
 
-## Web API + browser UI (FastAPI)
-
-`fastOCR/` contains a small FastAPI server with a web page for uploading a
-PNG/JPG or PDF and getting the recognized text back (rendered right-to-left):
-
-```bash
-pip install -r fastOCR/requirements.txt
-
-uvicorn fastOCR.main:app --port 8000     # from the repo root
-# — or —
-cd fastOCR && uvicorn main:app --port 8000   # from inside fastOCR/
-```
-
-Open **http://localhost:8000** in a browser, or call the API directly:
-
-```bash
-curl -F "file=@test.png" http://localhost:8000/ocr
-# → {"filename": "test.png", "text": "..."}
-```
-
 ## Using the trained model in your own code
 
 ```python
 import json, torch
 from huggingface_hub import hf_hub_download
-from fastOCR.ocr_engine import CRNN, ocr_file  # architecture + full page/PDF pipeline
+from test_model import CRNN, ocr_file  # architecture + full page/PDF pipeline
 
 REPO = "mhalimi3008/pashtoOCR"
 weights = hf_hub_download(REPO, "crnn_pashtoOCR.pt")
@@ -112,17 +92,13 @@ model.eval()
 ```
 
 For full pages and PDFs use `segment_lines` / `ocr_image` / `ocr_file` from
-`fastOCR/ocr_engine.py` (automatic line segmentation → per-line recognition).
+`test_model.py` (automatic line segmentation → per-line recognition).
 
 ## Repo structure
 
 | File | Purpose |
 |------|---------|
-| `test_model.py` | Command-line test script (images, PDFs, RTL terminal output) |
-| `fastOCR/ocr_engine.py` | All model code: CRNN, preprocessing, line segmentation, inference |
-| `fastOCR/main.py` | FastAPI server (`/ocr` endpoint + serves the web UI) |
-| `fastOCR/index.html` | Browser upload page with RTL result display |
-| `fastOCR/requirements.txt` | Dependencies for the API server |
+| `test_model.py` | Local inference script (images, PDFs) |
 | `test.png` | Sample Pashto image for testing |
 | `README.md` | This file |
 
