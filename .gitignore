@@ -4,6 +4,5 @@
 # --- whitelisted files ---
 !.gitignore
 !README.md
-!pashto_ocr_kaggle.ipynb
 !test_model.py
 !test.png
