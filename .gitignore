@@ -1,0 +1,9 @@
+# Ignore everything by default; explicitly whitelist what belongs in the repo.
+*
+
+# --- whitelisted files ---
+!.gitignore
+!README.md
+!pashto_ocr_kaggle.ipynb
+!test_model.py
+!test.png
